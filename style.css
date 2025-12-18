@@ -27,15 +27,23 @@ body {
 #choices button {
   display: block;
   width: 100%;
-  margin-bottom: 10px;
-  padding: 12px;
-  background-color: #1a1f33;
-  color: #e6e6e6;
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #4a5cff;
+  color: #ffffff;
   border: none;
+  border-radius: 14px;
   cursor: pointer;
   font-size: 16px;
+
+  transition: 
+    background-color 0.3s ease,
+    transform 0.2s ease,
+    opacity 0.4s ease;
 }
 
 #choices button:hover {
-  background-color: #2a3050;
+  background-color: #6c7bff;
+  transform: translateY(-2px);
 }
+
