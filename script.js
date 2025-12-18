@@ -19,10 +19,12 @@ let lastChoice = null;
 function showScene(scene) {
   const textDiv = document.getElementById("text");
   const choicesDiv = document.getElementById("choices");
+  const backBtn = document.getElementById("back-btn");
 
   textDiv.textContent = scene.text;
-
   choicesDiv.innerHTML = "";
+  backBtn.style.display = "none";
+
   scene.choices.forEach(choice => {
     const btn = document.createElement("button");
     btn.textContent = choice.text;
@@ -56,9 +58,11 @@ function choose(effect) {
 function showSaveSlots() {
   const textDiv = document.getElementById("text");
   const choicesDiv = document.getElementById("choices");
+  const backBtn = document.getElementById("back-btn");
 
   textDiv.textContent = "Выберите слот для сохранения:";
   choicesDiv.innerHTML = "";
+  backBtn.style.display = "inline-block";
 
   for (let i = 1; i <= 6; i++) {
     const slotBtn = document.createElement("button");
@@ -68,21 +72,21 @@ function showSaveSlots() {
     slotBtn.onclick = () => {
       localStorage.setItem(`slot${i}`, currentScene.id + "|" + (lastChoice || ""));
       alert(`Прогресс сохранён в слот ${i}`);
-      showScene(currentScene);
+      hideSlots();
     };
     choicesDiv.appendChild(slotBtn);
   }
-
-  addBackButton();
 }
 
 // --- Показ слотов загрузки ---
 function showLoadSlots() {
   const textDiv = document.getElementById("text");
   const choicesDiv = document.getElementById("choices");
+  const backBtn = document.getElementById("back-btn");
 
   textDiv.textContent = "Выберите слот для загрузки:";
   choicesDiv.innerHTML = "";
+  backBtn.style.display = "inline-block";
 
   for (let i = 1; i <= 6; i++) {
     const saved = localStorage.getItem(`slot${i}`);
@@ -95,27 +99,19 @@ function showLoadSlots() {
         const parts = saved.split("|");
         lastChoice = parts[1] || null;
         alert(`Прогресс из слота ${i} загружен. Выбранный вариант: ${lastChoice || "нет"}`);
-        showScene(currentScene);
+        hideSlots();
       } else {
         alert("Слот пуст.");
       }
     };
     choicesDiv.appendChild(slotBtn);
   }
-
-  addBackButton();
 }
 
-// --- Добавление кнопки "Назад" ---
-function addBackButton() {
-  const choicesDiv = document.getElementById("choices");
-  const backBtn = document.createElement("button");
-  backBtn.id = "back-btn";
-  backBtn.textContent = "Назад";
-  backBtn.onclick = () => showScene(currentScene);
-  choicesDiv.appendChild(backBtn);
+// --- Скрытие слотов и возврат к сцене ---
+function hideSlots() {
+  showScene(currentScene);
 }
 
 // --- Старт игры ---
 showScene(currentScene);
-
