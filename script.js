@@ -1,5 +1,6 @@
 // --- Первая сцена ---
 const scene1 = {
+  id: "scene1",
   text: `Я сижу за длинным столом. Деревянные доски под локтями холодные, а воздух в зале густой от свечей и тяжёлой тишины. Каждое слово родителей — словно удар молотка в груди, каждое движение — экзамен, от которого невозможно отвести взгляд. 
 Я слышу, как где-то за спиной поскрипывает половица, как тихо дышат сёстры. Всё вокруг подчинено правилам. И я чувствую, как внутри растёт что-то, что нельзя сдержать слишком долго.
 Сегодняшний вечер обычный, но я знаю: одно неверное слово, один резкий жест — и позор повиснет надо мной, как тень от деревьев в полдень. Сердце стучит быстрее, руки потеют. В горле стоит ком, но я должен выбрать, что делать.`,
@@ -11,8 +12,8 @@ const scene1 = {
 };
 
 // --- Глобальные переменные ---
-let currentScene = scene1; // текущая сцена
-let lastChoice = null;     // последний выбор
+let currentScene = scene1;
+let lastChoice = null;
 
 // --- Функция отображения сцены ---
 function showScene(scene) {
@@ -34,7 +35,7 @@ function showScene(scene) {
 
 // --- Функция обработки выбора ---
 function choose(effect) {
-  lastChoice = effect; // сохраняем текущий выбор
+  lastChoice = effect;
   const textDiv = document.getElementById("text");
   const choicesDiv = document.getElementById("choices");
 
@@ -48,29 +49,57 @@ function choose(effect) {
     textDiv.textContent = "Я скользну прочь, слышу собственное сердце громче, чем голоса за столом. Безопасно, но пустота внутри растёт, потому что я снова не показал себя.";
   }
 
-  // Кнопка для продолжения (пока заглушка)
   choicesDiv.innerHTML = `<button onclick="alert('Следующая сцена будет готова позже')">Продолжить</button>`;
 }
 
-// --- Функции сохранения и загрузки прогресса ---
-function saveProgress() {
-  if (lastChoice) {
-    localStorage.setItem('savedChoice', lastChoice);
-    alert('Прогресс сохранён!');
-  } else {
-    alert('Сначала сделайте выбор.');
+// --- Функции для сохранения и загрузки через слоты ---
+function showSaveSlots() {
+  const textDiv = document.getElementById("text");
+  const choicesDiv = document.getElementById("choices");
+
+  choicesDiv.innerHTML = "";
+  textDiv.textContent = "Выберите слот для сохранения:";
+
+  for (let i = 1; i <= 6; i++) {
+    const btn = document.createElement("button");
+    const slotName = localStorage.getItem(`slot${i}`) || "Пусто";
+    btn.textContent = `Слот ${i}: ${slotName}`;
+    btn.onclick = () => {
+      localStorage.setItem(`slot${i}`, currentScene.id + "|" + (lastChoice || ""));
+      alert(`Прогресс сохранён в слот ${i}`);
+      showScene(currentScene);
+    };
+    choicesDiv.appendChild(btn);
   }
 }
 
-function loadProgress() {
-  const saved = localStorage.getItem('savedChoice');
-  if (saved) {
-    choose(saved);
-    alert('Прогресс загружен!');
-  } else {
-    alert('Сохранения нет.');
+function showLoadSlots() {
+  const textDiv = document.getElementById("text");
+  const choicesDiv = document.getElementById("choices");
+
+  choicesDiv.innerHTML = "";
+  textDiv.textContent = "Выберите слот для загрузки:";
+
+  for (let i = 1; i <= 6; i++) {
+    const saved = localStorage.getItem(`slot${i}`);
+    const display = saved ? saved.split("|")[0] : "Пусто";
+    const btn = document.createElement("button");
+    btn.textContent = `Слот ${i}: ${display}`;
+    btn.onclick = () => {
+      if (saved) {
+        const parts = saved.split("|");
+        const sceneId = parts[0];
+        const choice = parts[1] || null;
+        lastChoice = choice;
+        alert(`Прогресс из слота ${i} загружен. Выбранный вариант: ${choice || "нет"}`);
+        showScene(currentScene); // пока возвращаем на текущую сцену
+      } else {
+        alert("Слот пуст.");
+      }
+    };
+    choicesDiv.appendChild(btn);
   }
 }
 
 // --- Старт игры ---
-showScene(scene1);
+showScene(currentScene);
